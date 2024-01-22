@@ -1,0 +1,2 @@
+# tfe_fdo_azure_external_kubernetes
+tfe_fdo_azure_external_kubernetes
