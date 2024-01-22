@@ -1,39 +1,57 @@
-output "client_public_ip" {
-  value = "ssh adminuser@${azurerm_public_ip.client.ip_address}"
+output "kubernetes_configuration" {
+  value = "az aks get-credentials --resource-group ${var.tag_prefix} --name ${var.tag_prefix}"
 }
 
-output "tfe_public_ip" {
-  value = "ssh adminuser@${azurerm_public_ip.tfe_instance.ip_address}"
+
+output "cluster_name" {
+  value = var.tag_prefix
 }
 
-output "tfe_appplication" {
-  value = "https://${var.dns_hostname}.${var.dns_zonename}"
+output "prefix" {
+  value = var.tag_prefix
 }
 
-output "ssh_tfe_server" {
-  value = "ssh adminuser@${var.dns_hostname}.${var.dns_zonename}"
+
+output "pg_dbname" {
+  value = "tfe"
 }
 
-# output "client_certificate" {
-#   value     = azurerm_kubernetes_cluster.example.kube_config.0.client_certificate
-#   sensitive = true
-# }
-
-# output "kube_config" {
-#   value = azurerm_kubernetes_cluster.example.kube_config_raw
-
-#   sensitive = true
-# }
-
-locals {
-  namespace = "terraform-enterprise"
-  full_chain = "${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}"
+output "pg_user" {
+  value = var.postgres_user
 }
 
-output "full_chain_encoded" {
-  value = base64encode(local.full_chain)
+output "pg_password" {
+  value = var.postgres_password
+  sensitive = true
 }
 
-output "private_key_encoded" {
-  value = base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))
+output "pg_address" {
+  value = azurerm_postgresql_flexible_server.example.fqdn
+}
+
+output "container_name" {
+  value = azurerm_storage_container.example.name
+}
+
+output "storage_account" {
+  value = azurerm_storage_account.example.name
+}
+
+output "storage_account_key" {
+  value = azurerm_storage_account.example.primary_access_key
+  sensitive = true
+}
+
+
+output "redis_host" {
+  value = azurerm_redis_cache.example.hostname
+}
+
+output "redis_port" {
+  value = azurerm_redis_cache.example.port
+}
+
+output "redis_primary_access_key" {
+  value = azurerm_redis_cache.example.primary_access_key
+  sensitive = true
 }

@@ -40,13 +40,6 @@ resource "azurerm_subnet" "public1" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 1)]
-  #   delegation {
-  #   name = "aciDelegation"
-  #   service_delegation {
-  #     name    = "Microsoft.ContainerInstance/containerGroups"
-  #     actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-  #   }
-  # }
 }
 
 resource "azurerm_subnet" "public2" {
@@ -54,14 +47,6 @@ resource "azurerm_subnet" "public2" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 2)]
-
-  # delegation {
-  #   name = "aciDelegation"
-  #   service_delegation {
-  #     name    = "Microsoft.ContainerInstance/containerGroups"
-  #     actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-  #   }
-  # }
 }
 
 resource "azurerm_subnet" "private1" {
@@ -86,16 +71,6 @@ resource "azurerm_subnet" "private2" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 12)]
-  # service_endpoints    = ["Microsoft.Storage"]
-  # delegation {
-  #   name = "fs"
-  #   service_delegation {
-  #     name = "Microsoft.DBforPostgreSQL/flexibleServers"
-  #     actions = [
-  #       "Microsoft.Network/virtualNetworks/subnets/join/action",
-  #     ]
-  #   }
-  # }
 }
 
 resource "azurerm_network_security_group" "tfe" {
@@ -288,143 +263,6 @@ resource "azurerm_storage_container" "example" {
   storage_account_name  = azurerm_storage_account.example.name
   container_access_type = "private"
 }
-
-resource "azurerm_public_ip" "client" {
-  name                = "${var.tag_prefix}-client-publicIP"
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  zones               = ["1"]
-}
-
-resource "azurerm_network_interface" "client" {
-  name                = "${var.tag_prefix}-client"
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-
-  ip_configuration {
-    name                          = "public_interface"
-    subnet_id                     = azurerm_subnet.public1.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.client.id
-  }
-}
-
-resource "azurerm_linux_virtual_machine" "client" {
-  name                = "${var.tag_prefix}-client"
-  resource_group_name = azurerm_resource_group.tfe.name
-  location            = azurerm_resource_group.tfe.location
-  size                = "Standard_D4s_v3"
-  admin_username      = "adminuser"
-  network_interface_ids = [
-    azurerm_network_interface.client.id,
-  ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = var.public_key
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "22.04.202312060"
-  }
-}
-
-resource "azurerm_public_ip" "tfe_instance" {
-  name                = "${var.tag_prefix}-tfe-publicIP"
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  zones               = ["1"]
-}
-
-resource "azurerm_network_interface" "tfe" {
-  name                = "${var.tag_prefix}-tfe"
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-
-  ip_configuration {
-    name                          = "public_interface"
-    subnet_id                     = azurerm_subnet.public1.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.tfe_instance.id
-  }
-}
-
-# resource "azurerm_linux_virtual_machine" "tfe" {
-#   name                = "${var.tag_prefix}-tfe"
-#   resource_group_name = azurerm_resource_group.tfe.name
-#   location            = azurerm_resource_group.tfe.location
-#   size                = "Standard_D4s_v3"
-#   admin_username      = "adminuser"
-
-#   network_interface_ids = [
-#     azurerm_network_interface.tfe.id,
-#   ]
-
-#   custom_data = base64encode(templatefile("${path.module}/scripts/cloudinit_tfe_server.yaml", {
-#     tag_prefix          = var.tag_prefix
-#     dns_hostname        = var.dns_hostname
-#     tfe_password        = var.tfe_password
-#     postgres_user       = var.postgres_user
-#     postgres_fqdn       = azurerm_postgresql_flexible_server.example.fqdn
-#     dns_zonename        = var.dns_zonename
-#     postgres_password   = var.postgres_password
-#     tfe_release         = var.tfe_release
-#     tfe_license         = var.tfe_license
-#     certificate_email   = var.certificate_email
-#     full_chain          = base64encode("${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}")
-#     private_key_pem     = base64encode(lookup(acme_certificate.certificate, "private_key_pem"))
-#     container_name      = azurerm_storage_container.example.name
-#     storage_account     = azurerm_storage_account.example.name
-#     storage_account_key = azurerm_storage_account.example.primary_access_key
-#   }))
-
-
-#   admin_ssh_key {
-#     username   = "adminuser"
-#     public_key = var.public_key
-#   }
-
-#   os_disk {
-#     caching              = "ReadWrite"
-#     storage_account_type = "StandardSSD_LRS"
-#   }
-
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "0001-com-ubuntu-server-jammy"
-#     sku       = "22_04-lts-gen2"
-#     version   = "22.04.202312060"
-#   }
-
-#   depends_on = [azurerm_postgresql_flexible_server.example]
-# }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 resource "azurerm_redis_cache" "example" {
   name                      = "${var.tag_prefix}-redis"
