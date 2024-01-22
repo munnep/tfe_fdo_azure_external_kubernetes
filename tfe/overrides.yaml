@@ -1,38 +1,35 @@
-replicaCount: 1
+replicaCount: ${replica_count}
 tls:
-  certData: 
-  caCertData: 
+  certData: ${cert_data}
+  keyData: ${key_data}
+  caCertData: ${ca_cert_data}
 image:
   repository: images.releases.hashicorp.com
   name: hashicorp/terraform-enterprise
-  tag: v202312-1
+  tag: ${tfe_release}
 env:
   variables:
-    TFE_HOSTNAME: tfe11.aws.munnep.com
+    TFE_HOSTNAME: ${fqdn}
     TFE_IACT_SUBNETS: "0.0.0.0/0"
 
     # Database Settings
-    TFE_DATABASE_USER: "tfe"
-    TFE_DATABASE_PASSWORD: "#1"
-    TFE_DATABASE_HOST: "tfe11-psqlflexibleserver.postgres.database.azure.com"
-    TFE_DATABASE_NAME: "tfe"
+    TFE_DATABASE_USER: ${pg_user}
+    TFE_DATABASE_PASSWORD: ${pg_password}
+    TFE_DATABASE_HOST: ${pg_address}
+    TFE_DATABASE_NAME: ${pg_dbname}
     TFE_DATABASE_PARAMETERS: "sslmode=require"
     
     # Redis settings
-    TFE_REDIS_HOST: tfe11-redis.redis.cache.windows.net:6379
-    TFE_REDIS_PASSWORD: "="
-    # TFE_REDIS_HOST: ${redis_host}
+    TFE_REDIS_HOST: ${redis_host}
+    TFE_REDIS_PASSWORD: ${redis_primary_access_key}
     TFE_REDIS_USE_AUTH: true
     
-
- 
     # Object storage settings.
     TFE_OBJECT_STORAGE_TYPE: "azure"
-    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: "tfe11patrick"
-    TFE_OBJECT_STORAGE_AZURE_CONTAINER: "tfe11-container"
-    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: "C4zE/+"
+    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ${storage_account}
+    TFE_OBJECT_STORAGE_AZURE_CONTAINER: ${container_name}
+    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ${storage_account_key}
   secrets:
-    TFE_DATABASE_PASSWORD: "#1"
-    TFE_ENCRYPTION_PASSWORD: "#1"
-    # TFE_OBJECT_STORAGE_S3_SERVER_SIDE_ENCRYPTION: AES256
-    TFE_LICENSE: ""
+    TFE_DATABASE_PASSWORD: ${pg_password}
+    TFE_ENCRYPTION_PASSWORD:  ${enc_password}
+    TFE_LICENSE: ${tfe_license}
