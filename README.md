@@ -1,4 +1,4 @@
-# Creating a TFE external installation on Kubernetes - Azure
+# Creating a TFE external installation on Kubernetes - Azure  
 
 With this repository you will install a Terraform Enterprise environment on a Azure Kubernetes cluster (AKS) using Terraform. Kubernetes only supports an active-active configuration with an external Redis database. 
 
