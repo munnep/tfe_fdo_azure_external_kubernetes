@@ -7,7 +7,7 @@ The manual steps for creating a TFE external installation on Kubernetes can be f
 # Creating the infrastructure
 
 We create the infrastructure according to the following diagram for the kubernetes environment
-![](diagram/diagram_tfe_kubernetes.png)  
+![](diagram/diagram_tfe_fdo_azure_external_kubernetes.png)  
 
 # Prerequisites
 ## AWS
