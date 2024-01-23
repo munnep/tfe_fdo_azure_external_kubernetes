@@ -2,20 +2,17 @@ terraform {
   required_providers {
     azurerm = {
       source = "hashicorp/azurerm"
+      version = "3.88.0"
     }
     acme = {
       source  = "vancluever/acme"
-      version = "~> 2.5.3"
+      version = "2.5.3"
     }
   }
 }
 
 provider "azurerm" {
   features {}
-}
-
-provider "aws" {
-  region = var.region
 }
 
 provider "acme" {
