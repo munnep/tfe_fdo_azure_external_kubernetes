@@ -12,7 +12,7 @@ from diagrams.azure.network import LoadBalancers
 
 
 # Variables
-title = "VNET with 1 public subnet for the Kubernetes \ and 1 private subnets for PostgreSQL and Redis."
+title = "VNET with 1 public subnet for the Kubernetes \ and 2 private subnets for PostgreSQL and Redis."
 outformat = "png"
 filename = "diagram_tfe_fdo_azure_external_kubernetes"
 direction = "TB"
@@ -39,7 +39,8 @@ with Diagram(
                     Kubernetes_TFE = KubernetesServices("Kubernetes TFE")
                 with Cluster("subnet_private1"):
                      postgresql = DatabaseForPostgresqlServers("RDS Instance")
-                     Redis = CacheForRedis("Redis Instance")
+                with Cluster("subnet_private2"):
+                     Redis = CacheForRedis("Redis Instance")     
                
     # Diagram
 

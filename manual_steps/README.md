@@ -1,176 +1,187 @@
+# Manual steps
 
-# create a resource group
+These are the manual steps using the Azure Portal to create the Kubernetes environment where the TFE container can be deployed
 
-- Create a resource group where all the resources will fall under
-![](media/20221105164701.png)    
-![](media/20221105164714.png)    
-
-- Create a network 
-![](media/20221105164838.png)    
-![](media/20221105165042.png)    
-![](media/20221108092404.png)    
-![](media/20221105165638.png)    
-![](media/20221105165413.png)    
-![](media/20221105165510.png)    
-![](media/20221105165523.png)    
-![](media/20221105165757.png)    
-![](media/20221105165815.png)    
-
-- create an network security group   
-![](media/20221105171004.png)    
-![](media/20221105171114.png)    
-add some rules allow https, ssh and 8800 5432  
-![](media/20221105173023.png)    
-![](media/20221108093129.png)    
+## diagram
+Here is a diagram of what we create
 
 
 
+# Create the Azure infrastructure
+
+- Create a resource group where all the resources will fall under  
+![](media/20240123152619.png)   
+![](media/20240123152643.png)   
+
+- Create a network   
+![](media/20240123152737.png)  
+![](media/20240123152803.png)  
+![](media/20240123153251.png)   
+![](media/20240123153355.png)   
+
+
+- create an network security group     
+![](media/20240123153453.png)   
+![](media/20240123153504.png)   
+  - Go to the inbound security rules and add the following ports 
+    - 22 ssh
+    - 80 http
+    - 443 https
+    - 5432 postgresql
+    - 6379 redis non-ssl
+    - 6380 redis ssl    
+The overview should look like the following   
+![](media/20240123154517.png)   
 
 - create a NAT gateway   
-![](media/20221105171257.png)    
-![](media/20221105171326.png)   
-![](media/20221105171421.png)    
-![](media/20221105171441.png)    
+![](media/20240123154550.png)   
+![](media/20240123154611.png)   
+![](media/20240123154639.png)   
 
-- give all the subnets the network security group
-![](media/20221105171724.png)    
+- create subnets  
+public subnet  
+![](media/20240123154823.png)  
+private1 subnet  
+![](media/20240123154910.png)  
+![](media/20240123155716.png)  
+private2 subnet  
+![](media/20240123160428.png)  
+overview  
+![](media/20240123160458.png)   
 
 
-- PostgreSQL Flex  
-![](media/20221108093908.png)    
-![](media/20221108094039.png)    
-![](media/20221108094238.png)    
-![](media/20221108094951.png)    
-![](media/20221108095007.png)    
-![](media/20221108095023.png)    
+- PostgreSQL Flex   
+![](media/20240123155120.png)  
+![](media/20240123155140.png)  
+![](media/20240123155900.png)  
+![](media/20240123155814.png)   
+add a database called tfe  
+![](media/20240123164756.png)  
+
 
 - After the database is create you need to change the following because of this article https://support.hashicorp.com/hc/en-us/articles/4548903433235-Terraform-Enterprise-External-Services-mode-with-Azure-Database-for-PostgreSQL-Flexible-Server-Failed-to-Initialize-**Plugins**
-![](media/20221108103715.png)    
 Select CITEXT, HSTORE, and UUID-OSSP  
-![](media/20221108103911.png)  
+![](media/20240123161355.png)  
 Result should be    
-![](media/20221108103849.png)    
-![](media/20221108104017.png)    
+![](media/20240123161412.png)  
 
-
-
+- Redis Cache  
+![](media/20240123160556.png)  
+![](media/20240123160709.png)  
+![](media/20240123160729.png)  
+![](media/20240123160740.png)   
 
 - Storage account   
-![](media/20221108095517.png)    
-![](media/20221108095556.png)    
-![](media/20221108103508.png)    
-![](media/20221108103545.png)    
-![](media/20221108103602.png)    
-![](media/20221108103621.png)   
-![](media/20221108104339.png)     
+![](media/20240123161829.png)  
+![](media/20240123161912.png)  
+![](media/20240123162045.png)  
+![](media/20240123162108.png)  
+![](media/20240123162132.png)  
+![](media/20240123162148.png)  
+
+
 - create a container   
-![](media/20221108103950.png)    
-![](media/20221108104128.png)    
+![](media/20240123162725.png)   
 
-- Virtual machine   
-![](media/20221108111017.png)    
-![](media/20221108111334.png)    
-![](media/20221108111423.png)    
-![](media/20221108111513.png)    
-![](media/20221108111540.png)    
-![](media/20221108111552.png)    
-![](media/20221108111615.png)    
-![](media/20221108111653.png)    
+save the keys and all   
+![](media/20240123162822.png)   
 
-- Make the DNS endpoint to this server in AWS console
-![](media/20221108112137.png)    
+- Create the Azure Kubernetes Service   
+![](media/20240123162923.png)  
+![](media/20240123163009.png)   
+![](media/20240123163132.png)  
+![](media/20240123163152.png)  
+![](media/20240123163206.png)  
+![](media/20240123163231.png)  
 
-- login to the virtual machine
+# deploying the TFE helm chart 
 
+- Make sure you can connect to the Kubernetes cluster
 ```
-ssh azureuser@52.233.240.242
+az aks get-credentials --resource-group tfe11-manual --name tfe11
 ```
-
-On the machine execute the following
-
+- check that you see the pods from all namespace. This should give some results
 ```
-sudo systemctl stop apparmor
-sudo systemctl disable apparmor
-
-pushd /var/tmp
-curl -o install.sh https://install.terraform.io/ptfe/stable
-bash ./install.sh no-proxy private-address=10.233.1.4 public-address=52.233.240.242
+kubectl get pods -A
 ```
-
-- You will be prompted to go to the installation screen
-![](media/20221108113116.png)   
-![](media/20221108113202.png)    
-![](media/20221108113242.png)    
-![](media/20221108113440.png)    
-- Go the the settings
-![](media/20221108113700.png)    
-![](media/20221108113752.png)    
-![](media/20221108113918.png)    
-![](media/20221108114537.png)    
-![](media/20221108114610.png)    
-![](media/20221108114624.png)  
-
-- Try a test run in a workspace from directory test_code
-
-
-
-### same steps except with a load balancer
-
-- Loadbalancer in azure is called a application gateway
-https://medium.com/@t.tak/build-https-support-load-balancer-on-azure-81e111e58d98
-
-Application gateway requires extra ports to be opened
-![](media/20221119094144.png)    
-
-![](media/20221119094209.png)    
-![](media/20221119094236.png)    
-![](media/20221119094350.png)    
-![](media/20221119094403.png)    
-![](media/20221119094952.png)    
-![](media/20221119095103.png)    
-![](media/20221119095123.png)    
-![](media/20221119095242.png)    
-![](media/20221119095308.png)    
-![](media/20221119095326.png)    
-Er moet ook een correct health probe worden gemaakt    
-
-![](media/20221119134143.png)  
-![](media/20221119134214.png)    
-
-On the machine execute the following
-
+- create the namespace
 ```
-sudo systemctl stop apparmor
-sudo systemctl disable apparmor
-
-pushd /var/tmp
-curl -o install.sh https://install.terraform.io/ptfe/stable
-bash ./install.sh no-proxy private-address=10.233.11.4
+kubectl create namespace terraform-enterprise
 ```
+- create the docker secret
+```
+kubectl create secret docker-registry terraform-enterprise --docker-server=images.releases.hashicorp.com --docker-username=terraform --docker-password="license_content_from_hashicorp" -n terraform-enterprise
+```
+- Have the yaml file with the correct values
+```
+replicaCount: 1
+tls:
+  certData: "xxxxxxx=="
+  keyData: "xxxxxxxx=="
+  caCertData: "xxxxxxx=="
+image:
+  repository: images.releases.hashicorp.com
+  name: hashicorp/terraform-enterprise
+  tag: v202312-1
+env:
+  variables:
+    TFE_HOSTNAME: tfe11.aws.munnep.com
+    TFE_IACT_SUBNETS: "0.0.0.0/0"
 
-
-
-
-
-
-
-
-
-
-
-certificates uit key vault
-
-// pem to pfx - also password
-openssl pkcs12 -export -out certificate.pfx -inkey private_key_pem -in server.crt
-
-
-
-
-
-
-
-
-
-
-// pem to cer
-openssl x509 -inform PEM -in fullchain.pem -outform DER -out certificate.cer
+    # Database Settings
+    TFE_DATABASE_USER: tfe
+    TFE_DATABASE_PASSWORD: "xxxxxxx"
+    TFE_DATABASE_HOST: tfe11.postgres.database.azure.com
+    TFE_DATABASE_NAME: tfe
+    TFE_DATABASE_PARAMETERS: "sslmode=require"
+    
+    # Redis settings
+    TFE_REDIS_HOST: tfe11.redis.cache.windows.net:6379
+    TFE_REDIS_PASSWORD: xxxxx
+    TFE_REDIS_USE_AUTH: true
+    
+    # Object storage settings.
+    TFE_OBJECT_STORAGE_TYPE: "azure"
+    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: patricktfe11manual
+    TFE_OBJECT_STORAGE_AZURE_CONTAINER: tfe11
+    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: 
+  secrets:
+    TFE_DATABASE_PASSWORD: "xxxxxxx"
+    TFE_ENCRYPTION_PASSWORD:  "xxxxxx"
+    TFE_LICENSE: "your_license"
+```
+- install the helm chart 
+```
+helm install terraform-enterprise hashicorp/terraform-enterprise -n terraform-enterprise --values overrides.yaml
+```
+- After a few minutes the pod should be up and running
+```
+kubectl get pods -n terraform-enterprise --watch
+NAME                                    READY   STATUS              RESTARTS   AGE
+terraform-enterprise-64d7bc4b6b-2l9rt   0/1     ContainerCreating   0          16s
+terraform-enterprise-64d7bc4b6b-2l9rt   0/1     Running             0          26s
+terraform-enterprise-64d7bc4b6b-2l9rt   1/1     Running             0          2m51s
+```
+- This should also have created a loadbalancer. If not uninstall the helm chart and install it again. 
+```
+kubectl get services -n terraform-enterprise                              
+NAME                   TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)         AGE
+terraform-enterprise   LoadBalancer   10.0.18.149   52.146.55.195   443:32625/TCP   67s
+```
+- Create an A records in you DNS to connect to the TFE environment   
+![](media/20240123171232.png)   
+- Connect to the environment on your url and see the login screen   
+![](media/20240123171414.png)   
+- Get the token to create the first admin user
+```
+kubectl exec -it terraform-enterprise-64d7bc4b6b-xdzgd -n terraform-enterprise -- tfectl admin token
+391ad31a26c7cccc2484ec3aea071782231486bdb79894d97bc32bff5af949ba
+```
+- Go to a browser with the token from above   
+https://tfe11.aws.munnep.com/admin/account/new?token=391ad31a26c7cccc2484ec3aea071782231486bdb79894d97bc32bff5af949ba
+- Fill in the following information  
+![](media/20240124084009.png)  
+- Now you can login and create a new organization
+![](media/20240124084035.png)
+- Create a workspace and do a run to verify all is working correctly  
+![](media/20240124084400.png)
