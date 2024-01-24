@@ -5,7 +5,7 @@ These are the manual steps using the Azure Portal to create the Kubernetes envir
 ## diagram
 Here is a diagram of what we create
 
-
+![](../diagram/diagram_tfe_fdo_azure_external_kubernetes.png)  
 
 # Create the Azure infrastructure
 
