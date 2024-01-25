@@ -39,12 +39,12 @@ resource "azurerm_subnet" "public1" {
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 1)]
 }
 
-resource "azurerm_subnet" "public2" {
-  name                 = "${var.tag_prefix}-public2"
-  resource_group_name  = azurerm_resource_group.tfe.name
-  virtual_network_name = azurerm_virtual_network.tfe.name
-  address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 2)]
-}
+# resource "azurerm_subnet" "public2" {
+#   name                 = "${var.tag_prefix}-public2"
+#   resource_group_name  = azurerm_resource_group.tfe.name
+#   virtual_network_name = azurerm_virtual_network.tfe.name
+#   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 2)]
+# }
 
 resource "azurerm_subnet" "private1" {
   name                 = "${var.tag_prefix}-private1"
@@ -154,10 +154,10 @@ resource "azurerm_subnet_network_security_group_association" "tfe-public1" {
   network_security_group_id = azurerm_network_security_group.tfe.id
 }
 
-resource "azurerm_subnet_network_security_group_association" "tfe-public2" {
-  subnet_id                 = azurerm_subnet.public2.id
-  network_security_group_id = azurerm_network_security_group.tfe.id
-}
+# resource "azurerm_subnet_network_security_group_association" "tfe-public2" {
+#   subnet_id                 = azurerm_subnet.public2.id
+#   network_security_group_id = azurerm_network_security_group.tfe.id
+# }
 
 resource "azurerm_subnet_network_security_group_association" "tfe-private1" {
   subnet_id                 = azurerm_subnet.private1.id
@@ -288,7 +288,7 @@ resource "azurerm_kubernetes_cluster" "example" {
     name           = "default"
     node_count     = 1
     vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_subnet.public2.id
+    vnet_subnet_id = azurerm_subnet.public1.id
   }
 
   identity {
