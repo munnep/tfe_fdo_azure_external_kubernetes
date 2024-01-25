@@ -57,7 +57,7 @@ storage_account   = "tfe11patrick"               # Name of the storage account t
 ```
 terraform init
 ```
-- Create the AWS resources
+- Create the Azure resources
 ```
 terraform apply
 ```

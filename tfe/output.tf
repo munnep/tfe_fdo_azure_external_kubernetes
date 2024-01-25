@@ -6,3 +6,16 @@ output "tfe_application_url" {
 output "execute_script_to_create_user_admin" {
   value = "./configure_tfe.sh ${var.dns_hostname}.${var.dns_zonename} patrick.munne@hashicorp.com Password#1"
 }
+
+
+# output "cert_data" {
+#   value = base64encode(local.full_chain)
+# }
+
+# output "key_data" {
+#   value = base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))
+# }
+
+# output "ca_cert_data" {
+#   value = base64encode(local.full_chain)
+# }
