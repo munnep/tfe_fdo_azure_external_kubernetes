@@ -99,6 +99,7 @@ tfe_license                = "02MV4UU43BK5HGYYTOJZ"                    # TFE lic
 replica_count              = 1                                         # Number of replicas for TFE you would like to have started
 tfe_license                = "<your_tfe_license_raw_text>"             # Your TFE license in raw text
 tfe_release                = "v202312-1"                               # The version of TFE application you wish to be deployed   
+load_balancer_type         = "external"                                # If you would like to have an "internal" or "external" loadbalancer
 # AWS
 region                     = "eu-north-1"                              # To create the DNS record on AWS          
 ```
@@ -127,3 +128,6 @@ tfe_application_url = "https://tfe11.aws.munnep.com"
 
 
 
+## Extra notes
+
+- Documentation about the Internal Load balancer on Azure can be found [here](https://learn.microsoft.com/en-us/azure/aks/internal-lb?tabs=set-service-annotations#create-an-internal-load-balancer)
