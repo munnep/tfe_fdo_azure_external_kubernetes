@@ -7,6 +7,16 @@ image:
   repository: images.releases.hashicorp.com
   name: hashicorp/terraform-enterprise
   tag: ${tfe_release}
+# If you remove the entire service block it will create an external load balancer. 
+service:
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "${load_balancer_type}"
+  type: LoadBalancer
+  ports:
+    - name: https-443
+      port: 443
+      protocol: TCP
+      targetPort: 8443  
 env:
   variables:
     TFE_HOSTNAME: ${fqdn}
@@ -21,8 +31,10 @@ env:
     
     # Redis settings
     TFE_REDIS_HOST: ${redis_host}
+    # TFE_REDIS_HOST: tfe11-redis.redis.cache.windows.net:6380
     TFE_REDIS_PASSWORD: ${redis_primary_access_key}
     TFE_REDIS_USE_AUTH: true
+    # TFE_REDIS_USE_TLS: true
     
     # Object storage settings.
     TFE_OBJECT_STORAGE_TYPE: "azure"

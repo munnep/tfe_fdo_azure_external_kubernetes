@@ -142,6 +142,8 @@ resource "helm_release" "tfe" {
       container_name           = data.terraform_remote_state.infra.outputs.container_name
       tfe_license              = var.tfe_license
       tfe_release              = var.tfe_release
+      load_balancer_type       = var.load_balancer_type == "external" ? "false" : "true"
+      replica_count            = var.replica_count
     })
   ]
   depends_on = [
@@ -168,6 +170,6 @@ resource "aws_route53_record" "tfe" {
   depends_on = [helm_release.tfe]
 }
 
-# output "kubernetes_service" {
-#   value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
-# }
+output "kubernetes_service" {
+  value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
+}

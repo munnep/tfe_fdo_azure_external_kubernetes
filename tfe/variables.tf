@@ -4,6 +4,11 @@ variable "dns_hostname" {
   description = "DNS hostname"
 }
 
+variable "load_balancer_type" {
+  description = "Choose between an extneral or internal load balancer"
+  default = "external"
+}
+
 variable "dns_zonename" {
   description = "DNS zonename"
 }

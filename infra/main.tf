@@ -278,6 +278,19 @@ resource "azurerm_redis_cache" "example" {
   }
 }
 
+
+data "azurerm_subscription" "primary" {
+}
+
+
+# for the permissions for loadbalancers
+resource "azurerm_role_assignment" "aks_system_assigned_identity" {
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.example.identity[0].principal_id
+  #principal_id         = azurerm_kubernetes_cluster.tfe[0].kubelet_identity[0].object_id
+}
+
 resource "azurerm_kubernetes_cluster" "example" {
   name                = var.tag_prefix
   location            = azurerm_resource_group.tfe.location
@@ -286,9 +299,13 @@ resource "azurerm_kubernetes_cluster" "example" {
 
   default_node_pool {
     name           = "default"
-    node_count     = 1
+    node_count     = 2
     vm_size        = "Standard_D2_v2"
     vnet_subnet_id = azurerm_subnet.public1.id
+
+    upgrade_settings {
+      max_surge = "10%"
+    }
   }
 
   identity {
