@@ -113,63 +113,71 @@ DOCKER
 # #   ]
 # # }
 
-# # The default for using the helm chart from internet
-resource "helm_release" "tfe" {
-  name       = local.namespace
-  repository = "helm.releases.hashicorp.com"
-  chart      = "hashicorp/terraform-enterprise"
-  namespace  = local.namespace
+# # # The default for using the helm chart from internet
+# resource "helm_release" "tfe" {
+#   name       = local.namespace
+#   repository = "helm.releases.hashicorp.com"
+#   chart      = "hashicorp/terraform-enterprise"
+#   namespace  = local.namespace
+#   version    = "1.3.2"
 
-  values = [
-    templatefile("${path.module}/overrides.yaml", {
-      replica_count            = var.replica_count
-      # region                   = data.terraform_remote_state.infra.outputs.region
-      enc_password             = var.tfe_encryption_password
-      pg_dbname                = data.terraform_remote_state.infra.outputs.pg_dbname
-      pg_user                  = data.terraform_remote_state.infra.outputs.pg_user
-      pg_password              = data.terraform_remote_state.infra.outputs.pg_password
-      pg_address               = data.terraform_remote_state.infra.outputs.pg_address
-      pg_dbname                = data.terraform_remote_state.infra.outputs.pg_dbname
-      fqdn                     = "${var.dns_hostname}.${var.dns_zonename}"
-      cert_data                = "${base64encode(local.full_chain)}"
-      key_data                 = "${base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))}"
-      ca_cert_data             = "${base64encode(local.full_chain)}"
-      redis_host               = data.terraform_remote_state.infra.outputs.redis_host
-      redis_port               = data.terraform_remote_state.infra.outputs.redis_port
-      redis_primary_access_key = data.terraform_remote_state.infra.outputs.redis_primary_access_key
-      storage_account_key      = data.terraform_remote_state.infra.outputs.storage_account_key
-      storage_account          = data.terraform_remote_state.infra.outputs.storage_account
-      container_name           = data.terraform_remote_state.infra.outputs.container_name
-      tfe_license              = var.tfe_license
-      tfe_release              = var.tfe_release
-      load_balancer_type       = var.load_balancer_type == "external" ? "false" : "true"
-      replica_count            = var.replica_count
-    })
-  ]
-  depends_on = [
-    kubernetes_secret.example, kubernetes_namespace.terraform-enterprise
-  ]
-}
+#   values = [
+#     templatefile("${path.module}/overrides.yaml", {
+#       replica_count = var.replica_count
+#       # region                   = data.terraform_remote_state.infra.outputs.region
+#       enc_password             = var.tfe_encryption_password
+#       pg_dbname                = data.terraform_remote_state.infra.outputs.pg_dbname
+#       pg_user                  = data.terraform_remote_state.infra.outputs.pg_user
+#       pg_password              = data.terraform_remote_state.infra.outputs.pg_password
+#       pg_address               = data.terraform_remote_state.infra.outputs.pg_address
+#       pg_dbname                = data.terraform_remote_state.infra.outputs.pg_dbname
+#       fqdn                     = "${var.dns_hostname}.${var.dns_zonename}"
+#       cert_data                = "${base64encode(local.full_chain)}"
+#       key_data                 = "${base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))}"
+#       ca_cert_data             = "${base64encode(local.full_chain)}"
+#       redis_host               = data.terraform_remote_state.infra.outputs.redis_host
+#       redis_port               = data.terraform_remote_state.infra.outputs.redis_port
+#       redis_primary_access_key = data.terraform_remote_state.infra.outputs.redis_primary_access_key
+#       storage_account_key      = data.terraform_remote_state.infra.outputs.storage_account_key
+#       storage_account          = data.terraform_remote_state.infra.outputs.storage_account
+#       container_name           = data.terraform_remote_state.infra.outputs.container_name
+#       tfe_license              = var.tfe_license
+#       tfe_release              = var.tfe_release
+#       load_balancer_type       = var.load_balancer_type == "external" ? "false" : "true"
+#       replica_count            = var.replica_count
+#     })
+#   ]
+#   depends_on = [
+#     kubernetes_secret.example, kubernetes_namespace.terraform-enterprise
+#   ]
+# }
 
-data "kubernetes_service" "example" {
-  metadata {
-    name      = local.namespace
-    namespace = local.namespace
-  }
-  depends_on = [helm_release.tfe]
-}
+# data "kubernetes_service" "example" {
+#   metadata {
+#     name      = local.namespace
+#     namespace = local.namespace
+#   }
+#   depends_on = [helm_release.tfe]
+# }
 
 
-resource "aws_route53_record" "tfe" {
-  zone_id = data.aws_route53_zone.selected.zone_id
-  name    = var.dns_hostname
-  type    = "A"
-  ttl     = "300"
-  records = [data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip]
+# resource "aws_route53_record" "tfe" {
+#   zone_id = data.aws_route53_zone.selected.zone_id
+#   name    = var.dns_hostname
+#   type    = "A"
+#   ttl     = "300"
+#   records = [data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip]
 
-  depends_on = [helm_release.tfe]
-}
+#   depends_on = [helm_release.tfe]
+# }
 
-output "kubernetes_service" {
-  value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
-}
+
+
+
+
+
+
+
+# output "kubernetes_service" {
+#   value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
+# }

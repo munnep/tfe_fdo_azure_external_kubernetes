@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: az
+    azure.workload.identity/use: "true"
+  name: az
+  namespace: terraform-enterprise
+  annotations:
+    azure.workload.identity/client-id: 19c64dec-9824-4a1d-942c-4408d2935559
+spec:
+  serviceAccount: terraform-enterprise
+  containers:
+  - image: mcr.microsoft.com/azure-cli:cbl-mariner2.0
+    name: az
+    resources: {}
+    command: ["sleep", "3000"]
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
