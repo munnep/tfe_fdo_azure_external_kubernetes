@@ -46,12 +46,12 @@ cd tfe_fdo_aws_external_kubernetes/infra
 - Create a file called `variables.auto.tfvars` with the following contents
 ```
 # General
-tag_prefix        = "tfe11"                      # General prefix used in the code and naming
+tag_prefix        = "tfe19"                      # General prefix used in the code and naming
 # Azure    
 vnet_cidr         = "10.211.0.0/16"              # Network for the VPC to be created
 postgres_user     = "tfe"                        # Postgres user to be used 
 postgres_password = "Password#1"                 # Password for the postgres user
-storage_account   = "tfe11patrick"               # Name of the storage account to be created which should be unique
+storage_account   = "tfe19patrick"               # Name of the storage account to be created which should be unique
 ``````
 - Initialize terraform
 ```
@@ -67,18 +67,18 @@ Apply complete! Resources: 24 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-cluster_name = "tfe11"
-container_name = "tfe11-container"
-kubernetes_configuration = "az aks get-credentials --resource-group tfe11 --name tfe11"
-pg_address = "tfe11-psqlflexibleserver.postgres.database.azure.com"
+cluster_name = "tfe19"
+container_name = "tfe19-container"
+kubernetes_configuration = "az aks get-credentials --resource-group tfe19 --name tfe19"
+pg_address = "tfe19-psqlflexibleserver.postgres.database.azure.com"
 pg_dbname = "tfe"
 pg_password = <sensitive>
 pg_user = "tfe"
-prefix = "tfe11"
-redis_host = "tfe11-redis.redis.cache.windows.net"
+prefix = "tfe19"
+redis_host = "tfe19-redis.redis.cache.windows.net"
 redis_port = 6379
 redis_primary_access_key = <sensitive>
-storage_account = "tfe11patrick"
+storage_account = "tfe19patrick"
 storage_account_key = <sensitive>
 ```
 - The kubernetes environment is created from an infrastructure standpoint.   
@@ -91,14 +91,13 @@ cd ../tfe
 ```
 - Create a file called `variables.auto.tfvars` with the following contents
 ```
-dns_hostname               = "tfe11"                                   # Hostname used for TFE
+dns_hostname               = "tfe19"                                   # Hostname used for TFE
 dns_zonename               = "aws.munnep.com"                          # DNS zone where the hostname record can be created
 certificate_email          = "patrick.munne@hashicorp.com"             # email address used for creating valid certificates
 tfe_encryption_password    = "Password#1"                              # encryption key used by TFE
-tfe_license                = "02MV4UU43BK5HGYYTOJZ"                    # TFE license as a string
 replica_count              = 1                                         # Number of replicas for TFE you would like to have started
 tfe_license                = "<your_tfe_license_raw_text>"             # Your TFE license in raw text
-tfe_release                = "v202312-1"                               # The version of TFE application you wish to be deployed   
+tfe_release                = "v202410-1"                               # The version of TFE application you wish to be deployed   
 load_balancer_type         = "external"                                # If you would like to have an "internal" or "external" loadbalancer
 # AWS
 region                     = "eu-north-1"                              # To create the DNS record on AWS          
@@ -117,16 +116,13 @@ Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-execute_script_to_create_user_admin = "./configure_tfe.sh tfe11.aws.munnep.com patrick.munne@hashicorp.com Password#1"
-tfe_application_url = "https://tfe11.aws.munnep.com"
+execute_script_to_create_user_admin = "./configure_tfe.sh tfe19.aws.munnep.com patrick.munne@hashicorp.com Password#1"
+tfe_application_url = "https://tfe19.aws.munnep.com"
 ```
-- Execute the `configure_tfe.sh tfe11.aws.munnep.com patrick.munne@hashicorp.com Password#1` script to do the following
+- Execute the `configure_tfe.sh tfe19.aws.munnep.com patrick.munne@hashicorp.com Password#1` script to do the following
   - Create a user called admin with the password specified
   - Create an organization called test
-- login to the application on url https://tfe11.aws.munnep.com
-
-
-
+- login to the application on url https://tfe19.aws.munnep.com
 
 ## Extra notes
 

@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "3.88.0"
     }
     acme = {
@@ -13,6 +13,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  skip_provider_registration = true
 }
 
 provider "acme" {
@@ -288,14 +289,19 @@ resource "azurerm_role_assignment" "aks_system_assigned_identity" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.example.identity[0].principal_id
-  #principal_id         = azurerm_kubernetes_cluster.tfe[0].kubelet_identity[0].object_id
+  # principal_id         = azurerm_user_assigned_identity.tfe.principal_id
+
 }
 
+
 resource "azurerm_kubernetes_cluster" "example" {
-  name                = var.tag_prefix
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-  dns_prefix          = var.tag_prefix
+  name                              = var.tag_prefix
+  location                          = azurerm_resource_group.tfe.location
+  resource_group_name               = azurerm_resource_group.tfe.name
+  dns_prefix                        = var.tag_prefix
+  oidc_issuer_enabled               = true
+  workload_identity_enabled         = true
+  role_based_access_control_enabled = true
 
   default_node_pool {
     name           = "default"
