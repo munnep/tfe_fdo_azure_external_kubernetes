@@ -46,12 +46,13 @@ cd tfe_fdo_aws_external_kubernetes/infra
 - Create a file called `variables.auto.tfvars` with the following contents
 ```
 # General
-tag_prefix        = "tfe19"                      # General prefix used in the code and naming
+tag_prefix        = "tfe19"                                            # General prefix used in the code and naming
 # Azure    
-vnet_cidr         = "10.211.0.0/16"              # Network for the VPC to be created
-postgres_user     = "tfe"                        # Postgres user to be used 
-postgres_password = "Password#1"                 # Password for the postgres user
-storage_account   = "tfe19patrick"               # Name of the storage account to be created which should be unique
+vnet_cidr         = "10.211.0.0/16"                                    # Network for the VPC to be created
+postgres_user     = "tfe"                                              # Postgres user to be used 
+postgres_password = "Password#1"                                       # Password for the postgres user
+storage_account   = "tfe19patrick"                                     # Name of the storage account to be created which should be unique
+subscription_id   = "c58f91c0-ac20-42fe-982f-xxxxxxx"                  # subscription ID
 ``````
 - Initialize terraform
 ```
@@ -100,7 +101,9 @@ tfe_license                = "<your_tfe_license_raw_text>"             # Your TF
 tfe_release                = "v202410-1"                               # The version of TFE application you wish to be deployed   
 load_balancer_type         = "external"                                # If you would like to have an "internal" or "external" loadbalancer
 # AWS
-region                     = "eu-north-1"                              # To create the DNS record on AWS          
+region                     = "eu-north-1"                              # To create the DNS record on AWS     
+# Azure
+subscription_id   = "c58f91c0-ac20-42fe-982f-xxxxxxx"                  # subscription ID
 ```
 - Initialize the environment
 ```

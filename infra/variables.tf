@@ -2,6 +2,10 @@ variable "tag_prefix" {
   description = "default prefix of names"
 }
 
+variable "subscription_id" {
+  description = "subscription id for azure"
+}
+
 variable "vnet_cidr" {
   description = "which private subnet do you want to use for the VPC. Subnet mask of /16"
 }
