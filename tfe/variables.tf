@@ -1,4 +1,6 @@
-
+variable "subscription_id" {
+  description = "subscription id for azure"
+}
 
 variable "dns_hostname" {
   description = "DNS hostname"

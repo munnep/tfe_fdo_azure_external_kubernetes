@@ -16,6 +16,10 @@ terraform {
       source  = "vancluever/acme"
       version = "~> 2.5.3"
     }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.7.0"
+    }
   }
 
   required_version = ">= 1.1"
@@ -33,4 +37,5 @@ provider "acme" {
 
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }

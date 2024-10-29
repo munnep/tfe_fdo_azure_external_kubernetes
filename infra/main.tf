@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      version = "3.88.0"
+      source  = "hashicorp/azurerm"
+      version = "4.7.0"
     }
     acme = {
       source  = "vancluever/acme"
@@ -13,6 +13,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+   subscription_id = var.subscription_id
 }
 
 provider "acme" {
@@ -37,6 +38,7 @@ resource "azurerm_subnet" "public1" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 1)]
+  private_endpoint_network_policies = "Enabled"
 }
 
 # resource "azurerm_subnet" "public2" {
@@ -51,6 +53,7 @@ resource "azurerm_subnet" "private1" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 11)]
+  private_endpoint_network_policies = "Enabled"
   service_endpoints    = ["Microsoft.Storage"]
   delegation {
     name = "fs"
@@ -68,6 +71,7 @@ resource "azurerm_subnet" "private2" {
   resource_group_name  = azurerm_resource_group.tfe.name
   virtual_network_name = azurerm_virtual_network.tfe.name
   address_prefixes     = [cidrsubnet(var.vnet_cidr, 8, 12)]
+  private_endpoint_network_policies = "Enabled"
 }
 
 resource "azurerm_network_security_group" "tfe" {
@@ -220,6 +224,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   administrator_login    = var.postgres_user
   administrator_password = var.postgres_password
   zone                   = "1"
+  public_network_access_enabled = false
 
   storage_mb = 32768
 
@@ -247,6 +252,7 @@ resource "azurerm_storage_account" "example" {
   location                 = azurerm_resource_group.tfe.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
+  cross_tenant_replication_enabled = true
 
   routing {
     publish_microsoft_endpoints = true
@@ -268,7 +274,7 @@ resource "azurerm_redis_cache" "example" {
   capacity                  = 1
   family                    = "P"
   sku_name                  = "Premium"
-  enable_non_ssl_port       = true
+  non_ssl_port_enabled      = true
   minimum_tls_version       = "1.2"
   private_static_ip_address = cidrhost(cidrsubnet(var.vnet_cidr, 8, 12), 22)
   subnet_id                 = azurerm_subnet.private2.id
@@ -288,14 +294,21 @@ resource "azurerm_role_assignment" "aks_system_assigned_identity" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.example.identity[0].principal_id
-  #principal_id         = azurerm_kubernetes_cluster.tfe[0].kubelet_identity[0].object_id
+  # principal_id         = azurerm_user_assigned_identity.tfe.principal_id
+
 }
 
+
 resource "azurerm_kubernetes_cluster" "example" {
-  name                = var.tag_prefix
-  location            = azurerm_resource_group.tfe.location
-  resource_group_name = azurerm_resource_group.tfe.name
-  dns_prefix          = var.tag_prefix
+  name                              = var.tag_prefix
+  location                          = azurerm_resource_group.tfe.location
+  resource_group_name               = azurerm_resource_group.tfe.name
+  dns_prefix                        = var.tag_prefix
+  oidc_issuer_enabled               = true
+  workload_identity_enabled         = true
+  role_based_access_control_enabled = true
+  node_os_upgrade_channel = "NodeImage"
+  image_cleaner_interval_hours = 48
 
   default_node_pool {
     name           = "default"

@@ -98,31 +98,18 @@ DOCKER
   type = "kubernetes.io/dockerconfigjson"
 }
 
-# # optional code to use the local repository download of the helm chart
-# # resource "helm_release" "tfe" {
-# #   name      = "terraform-enterprise"
-# #   chart     = "${path.module}/terraform-enterprise-helm"
-# #   namespace = "terraform-enterprise"
 
-# #   values = [
-# #     "${file("${path.module}/overrides.yaml")}"
-# #   ]
-
-# #   depends_on = [
-# #     kubernetes_secret.example, kubernetes_namespace.terraform-enterprise
-# #   ]
-# # }
-
-# # The default for using the helm chart from internet
+# # # The default for using the helm chart from internet
 resource "helm_release" "tfe" {
   name       = local.namespace
   repository = "helm.releases.hashicorp.com"
   chart      = "hashicorp/terraform-enterprise"
   namespace  = local.namespace
+  version    = "1.3.3"
 
   values = [
     templatefile("${path.module}/overrides.yaml", {
-      replica_count            = var.replica_count
+      replica_count = var.replica_count
       # region                   = data.terraform_remote_state.infra.outputs.region
       enc_password             = var.tfe_encryption_password
       pg_dbname                = data.terraform_remote_state.infra.outputs.pg_dbname
@@ -144,6 +131,7 @@ resource "helm_release" "tfe" {
       tfe_release              = var.tfe_release
       load_balancer_type       = var.load_balancer_type == "external" ? "false" : "true"
       replica_count            = var.replica_count
+      client_id_oidc           = data.terraform_remote_state.infra.outputs.client_id_oidc
     })
   ]
   depends_on = [
@@ -170,6 +158,13 @@ resource "aws_route53_record" "tfe" {
   depends_on = [helm_release.tfe]
 }
 
-output "kubernetes_service" {
-  value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
-}
+
+
+
+
+
+
+
+# output "kubernetes_service" {
+#   value = data.kubernetes_service.example.status.0.load_balancer.0.ingress.0.ip
+# }
