@@ -26,9 +26,28 @@ agents:
   rbac:
     enabled: true    
 
+# securityContext:
+#   runAsNonRoot: true
+#   runAsUser: 1000
+#   fsGroup: 1012
+
+# container:
+# # Configure pod specific security context settings
+#   securityContext: 
+#     seccompProfile:
+#       type: RuntimeDefault
+#     allowPrivilegeEscalation: false
+#     capabilities:
+#       drop:
+#         - ALL
+#     runAsNonRoot: true
+
+# openshift:
+#   enabled: true
 
 env:
   variables:
+    # TFE_RUN_PIPELINE_KUBERNETES_OPEN_SHIFT_ENABLED: "true"
     TFE_HOSTNAME: ${fqdn}
     TFE_IACT_SUBNETS: "0.0.0.0/0"
 
@@ -50,7 +69,8 @@ env:
     TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ${storage_account}
     TFE_OBJECT_STORAGE_AZURE_CONTAINER: ${container_name}
     TFE_OBJECT_STORAGE_AZURE_USE_MSI: false
-    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: bmljb2tub3dzYmVzdAo=            # added because of a bug in TFE 202410-1
+
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: bmljb2tub3dzYmVzdAo=            # added because of a bug in TFE 202410-1
     # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ${storage_account_key}        # Uncomment this line if you are using account key otherwise workload identity will be used.
   secrets:
     TFE_DATABASE_PASSWORD: ${pg_password}
