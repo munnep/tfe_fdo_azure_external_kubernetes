@@ -50,8 +50,18 @@ env:
     TFE_OBJECT_STORAGE_AZURE_ACCOUNT_NAME: ${storage_account}
     TFE_OBJECT_STORAGE_AZURE_CONTAINER: ${container_name}
     TFE_OBJECT_STORAGE_AZURE_USE_MSI: false
-    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: bmljb2tub3dzYmVzdAo=            # added because of a bug in TFE 202410-1
-    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ${storage_account_key}        # Uncomment this line if you are using account key otherwise workload identity will be used.
+    # TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: bmljb2tub3dzYmVzdAo=            # added because of a bug in TFE 202410-1
+    TFE_OBJECT_STORAGE_AZURE_ACCOUNT_KEY: ${storage_account_key}        # Uncomment this line if you are using account key otherwise workload identity will be used.
+
+    TFE_REDIS_HOST: ${redis_host}:${redis_port}
+    TFE_REDIS_USE_AUTH: true
+    TFE_REDIS_PASSWORD: ${redis_primary_access_key}
+
+
+    TFE_REDIS_SIDEKIQ_HOST: ${redis_sidekiq_host}:${redis_sidekiq_port}
+    TFE_REDIS_SIDEKIQ_USE_AUTH: true
+    TFE_REDIS_SIDEKIQ_PASSWORD: ${redis_sidekiq_primary_access_key}
+
   secrets:
     TFE_DATABASE_PASSWORD: ${pg_password}
     TFE_ENCRYPTION_PASSWORD:  ${enc_password}

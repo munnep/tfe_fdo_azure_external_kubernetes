@@ -43,15 +43,15 @@ output "storage_account_key" {
 }
 
 
-output "redis_host" {
-  value = azurerm_redis_cache.example.hostname
-}
+# output "redis_host" {
+#   value = azurerm_redis_cache.example.hostname
+# }
 
-output "redis_port" {
-  value = azurerm_redis_cache.example.port
-}
+# output "redis_port" {
+#   value = azurerm_redis_cache.example.port
+# }
 
-output "redis_primary_access_key" {
-  value = azurerm_redis_cache.example.primary_access_key
-  sensitive = true
-}
+# output "redis_primary_access_key" {
+#   value = azurerm_redis_cache.example.primary_access_key
+#   sensitive = true
+# }

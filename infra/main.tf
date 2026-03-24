@@ -1,26 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "4.7.0"
-    }
-    acme = {
-      source  = "vancluever/acme"
-      version = "2.5.3"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-   subscription_id = var.subscription_id
-}
-
-provider "acme" {
-  # server_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
-  server_url = "https://acme-v02.api.letsencrypt.org/directory"
-}
-
 resource "azurerm_resource_group" "tfe" {
   name     = var.tag_prefix
   location = "North Europe"
@@ -218,7 +195,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   name                   = "${var.tag_prefix}-psqlflexibleserver"
   resource_group_name    = azurerm_resource_group.tfe.name
   location               = azurerm_resource_group.tfe.location
-  version                = "12"
+  version                = "16"
   delegated_subnet_id    = azurerm_subnet.private1.id
   private_dns_zone_id    = azurerm_private_dns_zone.example.id
   administrator_login    = var.postgres_user
@@ -263,26 +240,26 @@ resource "azurerm_storage_account" "example" {
 
 resource "azurerm_storage_container" "example" {
   name                  = "${var.tag_prefix}-container"
-  storage_account_name  = azurerm_storage_account.example.name
+  storage_account_id    = azurerm_storage_account.example.id
   container_access_type = "private"
 }
 
-resource "azurerm_redis_cache" "example" {
-  name                      = "${var.tag_prefix}-redis"
-  location                  = azurerm_resource_group.tfe.location
-  resource_group_name       = azurerm_resource_group.tfe.name
-  capacity                  = 1
-  family                    = "P"
-  sku_name                  = "Premium"
-  non_ssl_port_enabled      = true
-  minimum_tls_version       = "1.2"
-  private_static_ip_address = cidrhost(cidrsubnet(var.vnet_cidr, 8, 12), 22)
-  subnet_id                 = azurerm_subnet.private2.id
-  redis_version             = 6
+# resource "azurerm_redis_cache" "example" {
+#   name                      = "${var.tag_prefix}-redis"
+#   location                  = azurerm_resource_group.tfe.location
+#   resource_group_name       = azurerm_resource_group.tfe.name
+#   capacity                  = 1
+#   family                    = "P"
+#   sku_name                  = "Premium"
+#   non_ssl_port_enabled      = true
+#   minimum_tls_version       = "1.2"
+#   private_static_ip_address = cidrhost(cidrsubnet(var.vnet_cidr, 8, 12), 22)
+#   subnet_id                 = azurerm_subnet.private2.id
+#   redis_version             = 6
 
-  redis_configuration {
-  }
-}
+#   redis_configuration {
+#   }
+# }
 
 
 data "azurerm_subscription" "primary" {
@@ -313,7 +290,7 @@ resource "azurerm_kubernetes_cluster" "example" {
   default_node_pool {
     name           = "default"
     node_count     = 2
-    vm_size        = "Standard_D2_v2"
+    vm_size        = "Standard_D2_v3"
     vnet_subnet_id = azurerm_subnet.public1.id
 
     upgrade_settings {

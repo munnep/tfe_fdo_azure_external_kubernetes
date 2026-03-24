@@ -25,6 +25,12 @@ Make sure kubectl is available on your system. Please see the documentation [her
 ## helm
 Make sure helm is available on your system. Please see the documentation [here](https://helm.sh/docs/intro/install/)
 
+## EDR
+To be compliant with IBM EDR policy you will need to add the following files to the ./infra directory
+
+k8sosquery-values.yaml   
+kubequery-values.yaml
+
 # How to
 
 - Clone this repository
