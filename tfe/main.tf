@@ -105,7 +105,7 @@ resource "helm_release" "tfe" {
   repository = "helm.releases.hashicorp.com"
   chart      = "hashicorp/terraform-enterprise"
   namespace  = local.namespace
-  version    = "1.3.3"
+  version    = "1.6.8"
 
   values = [
     templatefile("${path.module}/overrides.yaml", {

@@ -26,6 +26,10 @@ agents:
   rbac:
     enabled: true    
 
+resources:
+  requests:
+    memory: "4192Mi"
+    cpu: "2000m"
 
 env:
   variables:
